@@ -1,1 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#11131a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CardForge">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon55.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CardForge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#060b14">
+<title>CardForge — редактор карточек маркетплейсов</title>
+<style>
+:root{
+  --bg:#0c0e13;--panel:#151821;--panel2:#1b1f2a;--line:#2b3040;
+  --text:#f4f6fb;--muted:#a0a7ba;--accent:#a5f05c;--accent2:#d2ff9d;
+  --danger:#ff737d;--shadow:0 18px 48px rgba(0,0,0,.28);--radius:18px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1000px 600px at 75% -15%,#202638 0%,transparent 65%),var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px max(16px,env(safe-area-inset-left));background:rgba(12,14,19,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--accent);color:#11170b;font-weight:950;font-size:20px;box-shadow:0 0 26px #a5f05c24}
+.brandname{font-size:17px;font-weight:850;letter-spacing:-.5px}.brandname span{color:var(--accent)}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);padding:10px 13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s;white-space:nowrap}
+.btn:hover{border-color:#555e73;transform:translateY(-1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#151b0f}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--danger)}
+.btn.small{font-size:12px;padding:7px 10px;border-radius:9px}
+.btn.icon{width:40px;height:40px;padding:0;font-size:18px}
+.app{max-width:1500px;margin:0 auto;padding:22px 20px 40px}
+.intro{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:20px}
+.eyebrow{color:var(--accent);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:1.6px}
+h1{font-size:clamp(24px,3vw,36px);letter-spacing:-1.1px;line-height:1.1;margin:7px 0 8px}
+.intro p{margin:0;color:var(--muted);max-width:700px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #3c4933;background:#192019;color:#c6f8a2;padding:8px 11px;border-radius:99px;font-size:12px;white-space:nowrap}
+.pill:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.workspace{display:grid;grid-template-columns:minmax(285px,350px) minmax(300px,1fr) minmax(260px,310px);gap:16px;align-items:start}
+.panel{background:linear-gradient(180deg,#171a23,#13161e);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{padding:17px 18px 13px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel-head h2{font-size:14px;margin:0;font-weight:850}.step{font-size:10px;color:var(--muted);letter-spacing:1px}
+.panel-body{padding:17px}
+.section-label{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;font-size:12px;font-weight:800;color:#dce1ec}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:650}
+.input,textarea,select{width:100%;background:#0e1118;border:1px solid #303647;color:var(--text);border-radius:11px;padding:11px 12px;min-height:42px}
+textarea{resize:vertical;min-height:78px}
+.input::placeholder,textarea::placeholder{color:#626b7e}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.upload{border:1px dashed #4a5267;background:#11141c;border-radius:14px;min-height:118px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;cursor:pointer;transition:.2s}
+.upload:hover,.upload.dragover{border-color:var(--accent);background:#1a2117}
+.upload strong{display:block;font-size:13px;margin:5px 0}.upload small{color:var(--muted);font-size:11px}
+.upload .upload-icon{font-size:25px}
+.file-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.file-thumb{width:58px;height:58px;border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative;background:#0c0e13}
+.file-thumb img{width:100%;height:100%;object-fit:cover}
+.file-thumb button{position:absolute;right:2px;top:2px;border:0;background:#08090dcf;color:white;border-radius:50%;width:19px;height:19px;line-height:18px;padding:0}
+.helper{font-size:11px;color:var(--muted);margin-top:7px}
+.ai-panel{border:1px solid #46533a;background:linear-gradient(145deg,#192019,#12161a);border-radius:14px;padding:13px;margin:15px 0}
+.ai-panel h3{font-size:13px;margin:0 0 7px;color:#d8ffb6}.ai-panel .field{margin-bottom:11px}
+.ai-notice{font-size:11px;color:#c2c9b8;line-height:1.5;margin:8px 0 12px}
+.ai-status{font-size:11px;color:var(--muted);margin-top:9px;min-height:17px;overflow-wrap:anywhere}
+.ai-status.error{color:#ff969d}.ai-status.success{color:#c6f8a2}
+.ai-actions{display:grid;grid-template-columns:1fr;gap:8px}
+.ai-actions .btn{white-space:normal;text-align:center}
+.field .input[type=password]{letter-spacing:.04em}
+.divider{height:1px;background:rgba(255,255,255,.07);margin:18px 0}
+.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.template{border:1px solid var(--line);background:#11141b;border-radius:11px;padding:7px;color:var(--text);text-align:left}
+.template.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.template-preview{height:66px;border-radius:7px;overflow:hidden;position:relative;margin-bottom:7px;background:linear-gradient(135deg,#e8e8e3,#aaa)}
+.template-preview:before{content:"";position:absolute;width:37px;height:48px;border-radius:8px;background:linear-gradient(130deg,#fff,#bbb);right:13px;top:8px;box-shadow:0 6px 13px #0002}
+.template-preview:after{content:"";position:absolute;left:7px;top:13px;width:37px;height:5px;background:#202329;box-shadow:0 9px 0 #202329,0 18px 0 #777;border-radius:3px}
+.template[data-template="dark"] .template-preview{background:linear-gradient(135deg,#20232c,#090a0e)}
+.template[data-template="dark"] .template-preview:after{background:#c8ff8b;box-shadow:0 9px 0 #fff,0 18px 0 #777}
+.template[data-template="warm"] .template-preview{background:linear-gradient(135deg,#e5b990,#f5e5d4)}
+.template[data-template="warm"] .template-preview:after{background:#673c2b;box-shadow:0 9px 0 #673c2b,0 18px 0 #b57e59}
+.template span{font-size:11px;font-weight:750}
+.canvas-panel{min-width:0}
+.canvas-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.toolbar-group{display:flex;gap:7px;align-items:center}
+.canvas-wrap{padding:18px;background:radial-gradient(ellipse at center,#252a38 0%,#151821 68%);display:flex;justify-content:center;align-items:center;min-height:480px}
+.canvas-shell{width:min(100%,420px);position:relative;filter:drop-shadow(0 18px 25px #0005)}
+#cardCanvas{width:100%;height:auto;display:block;border-radius:3px;background:#f3f1eb;touch-action:manipulation}
+.canvas-note{padding:10px 15px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.status{color:#c8f6a7}
+.right-stack{display:flex;flex-direction:column;gap:16px}
+.color-row{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:31px;height:31px;border-radius:9px;border:2px solid #ffffff1a;position:relative;overflow:hidden}
+.swatch.active{outline:2px solid var(--accent);outline-offset:2px}
+.swatch input{opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+.range-row{display:flex;align-items:center;gap:10px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.range-value{font-size:11px;color:var(--muted);min-width:36px;text-align:right}
+.switch-row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--muted);margin-top:12px}
+.switch{appearance:none;width:38px;height:22px;border-radius:99px;background:#343a49;position:relative;cursor:pointer;flex-shrink:0}
+.switch:before{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.18s}
+.switch:checked{background:#7cb83f}.switch:checked:before{left:19px}
+.export-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.full{width:100%}
+.saved-list{display:flex;flex-direction:column;gap:7px}
+.saved-item{display:flex;align-items:center;gap:9px;padding:8px;background:#10131a;border:1px solid var(--line);border-radius:10px}
+.saved-preview{width:37px;height:45px;object-fit:cover;background:#282d38;border-radius:5px;flex-shrink:0}
+.saved-info{min-width:0;flex:1}.saved-info strong{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.saved-info small{color:var(--muted);font-size:10px}
+.saved-item .btn{padding:5px 7px;font-size:10px}
+.empty{font-size:12px;color:var(--muted);padding:9px 0}
+.footer{margin-top:18px;color:#737b8e;font-size:11px;text-align:center}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:99;background:#e4ffca;color:#15200e;padding:12px 17px;border-radius:12px;font-weight:800;font-size:13px;box-shadow:var(--shadow);transition:.25s;max-width:calc(100% - 30px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hidden{display:none!important}
+@media(max-width:1120px){.workspace{grid-template-columns:minmax(260px,330px) minmax(300px,1fr)}.right-stack{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.right-stack .panel:last-child{grid-column:1/-1}}
+@media(max-width:760px){
+ .topbar{padding:10px 12px}.brand-sub{display:none}.top-actions .desktop-label{display:none}.top-actions .btn{padding:9px 10px}
+ .app{padding:18px 11px calc(28px + env(safe-area-inset-bottom))}
+ .intro{display:block}.intro .pill{margin-top:13px}.intro p{font-size:13px}
+ .workspace{display:flex;flex-direction:column;gap:13px}.workspace>*,.right-stack{width:100%}.panel{border-radius:15px}
+ .panel-body{padding:14px}.panel-head{padding:14px}
+ .canvas-wrap{min-height:0;padding:15px 12px}.canvas-shell{width:min(100%,390px)}
+ .right-stack{display:flex}.right-stack .panel:last-child{grid-column:auto}
+ .canvas-toolbar{padding:10px}.canvas-note{font-size:10px}
+ .btn{min-height:40px}.export-actions .btn{white-space:normal}
+}
+@media(min-width:761px) and (max-width:1120px){.canvas-wrap{min-height:450px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">C</div>
+    <div><div class="brandname">CARD<span>FORGE</span></div><div class="brand-sub">Студия карточек маркетплейсов</div></div>
+  </div>
+  <div class="top-actions">
+    <button class="btn ghost" id="newProjectBtn" title="Новый проект">＋ <span class="desktop-label">Новый проект</span></button>
+    <button class="btn primary" id="quickExportBtn">↧ <span class="desktop-label">Скачать PNG</span></button>
+  </div>
+</header>
 
+<main class="app">
+  <section class="intro">
+    <div>
+      <div class="eyebrow">Рабочая студия · 01</div>
+      <h1>Создавайте карточки,<br>которые <span style="color:var(--accent)">выделяют товар</span></h1>
+      <p>Загрузите фото, соберите инфографику и при подключённом AI API замените фон товара. Макет редактируется в браузере, результат сохраняется в PNG.</p>
+    </div>
+    <div class="pill">Работает локально в браузере</div>
+  </section>
+
+  <section class="workspace">
+    <aside class="panel">
+      <div class="panel-head"><h2>01 / Контент карточки</h2><span class="step">ДАННЫЕ</span></div>
+      <div class="panel-body">
+        <div class="field">
+          <div class="section-label"><span>Фотография товара</span><span class="step">JPG · PNG · WEBP</span></div>
+          <label class="upload" id="uploadDrop" for="imageInput">
+            <span><span class="upload-icon">↥</span><strong>Загрузить фото товара</strong><small>Нажмите или перетащите изображение сюда</small><small>Фото остаётся на вашем устройстве</small></span>
+          </label>
+          <input id="imageInput" type="file" accept="image/*" multiple class="hidden">
+          <div id="fileList" class="file-list"></div>
+          <div class="helper">Можно добавить несколько фото и выбрать основное. Для лучшего результата используйте чёткий снимок товара.</div>
+        </div>
+        <section class="ai-panel" aria-labelledby="aiBackgroundTitle">
+          <h3 id="aiBackgroundTitle">✦ AI-замена фона товара</h3>
+          <p class="ai-notice"><strong>Важно:</strong> генерация не встроена в этот HTML. Для реальной работы нужен ваш AI-сервис или собственный backend с двумя маршрутами: <code>POST /remove-background</code> (возвращает PNG с прозрачностью) и <code>POST /generate-background</code> (возвращает изображение одного фона). Нужен доступ по HTTPS и разрешение CORS для этой страницы. Ключи безопаснее хранить на backend, а не в HTML.</p>
+          <div class="field"><label for="aiBaseUrl">Адрес API-сервиса (base URL)</label><input class="input" id="aiBaseUrl" type="url" placeholder="https://ваш-сервис.example.com" autocomplete="url"><div class="helper">Укажите адрес своего совместимого сервиса. В конце не добавляйте /remove-background.</div></div>
+          <div class="field"><label for="aiToken">Токен API (необязательно)</label><input class="input" id="aiToken" type="password" placeholder="Bearer-токен, если нужен" autocomplete="off"><div class="helper">Сохраняется только в памяти вкладки; не в проекте и не в localStorage.</div></div>
+          <div class="field"><label for="aiScene">Новый фон</label><select id="aiScene" class="input"><option value="studio">Студия — чистый профессиональный свет</option><option value="interior">Интерьер — естественная домашняя сцена</option><option value="premium">Премиум — дорогая предметная съёмка</option><option value="nature">Природа — натуральная спокойная сцена</option><option value="custom">По моему текстовому описанию</option></select></div>
+          <div class="field"><label for="aiPrompt">Описание фона</label><textarea id="aiPrompt" placeholder="Например: светлая минималистичная кухня, мягкий дневной свет, нейтральная палитра, свободное пространство за товаром"></textarea><div class="helper">Для выбранных пресетов описание заполнится автоматически. В режиме «По моему текстовому описанию» введите собственный запрос.</div></div>
+          <div class="ai-actions"><button class="btn primary full" id="aiReplaceBtn">✦ Удалить старый фон и создать новый</button><button class="btn full" id="aiRestoreBtn">Вернуть исходное фото</button></div>
+          <div id="aiStatus" class="ai-status" role="status" aria-live="polite">AI-сервис не настроен. Введите адрес совместимого API.</div>
+        </section>
+        <div class="divider"></div>
+        <div class="field"><label for="productName">Название товара</label><input class="input" id="productName" maxlength="90" value="Органайзер для дома" placeholder="Например, органайзер для дома"></div>
+        <div class="field"><label for="subtitle">Короткий подзаголовок</label><input class="input" id="subtitle" maxlength="110" value="Порядок в каждой детали" placeholder="Главное преимущество товара"></div>
+        <div class="field"><label for="benefits">Преимущества — каждое с новой строки</label><textarea id="benefits" maxlength="500" placeholder="Компактное хранение&#10;Прочные материалы&#10;Удобно каждый день">Компактное хранение
+Прочные материалы
+Удобно каждый день</textarea><div class="helper">Указывайте только реальные характеристики товара.</div></div>
+        <div class="field-row">
+          <div class="field"><label for="badgeText">Плашка / акцент</label><input class="input" id="badgeText" maxlength="30" value="ХИТ ДЛЯ ДОМА" placeholder="Например, новинка"></div>
+          <div class="field"><label for="footerText">Нижняя подпись</label><input class="input" id="footerText" maxlength="45" value="Удобство каждый день" placeholder="Короткая фраза"></div>
+        </div>
+        <div class="field"><label for="category">Категория товара</label>
+          <select id="category" class="input">
+            <option>Дом и кухня</option><option>Одежда и аксессуары</option><option>Красота и уход</option><option>Электроника</option><option>Спорт и отдых</option><option>Детские товары</option><option>Зоотовары</
+option><option>Аксессуары</
+option><option>Открытки</
+option><option>Другое</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div class="section-label"><span>Быстрый старт макета</span><span class="step">СТИЛЬ</span></div>
+        <div class="template-grid">
+          <button class="template active" data-template="light"><div class="template-preview"></div><span>Чистый</span></button>
+          <button class="template" data-template="dark"><div class="template-preview"></div><span>Премиум</span></button>
+          <button class="template" data-template="warm"><div class="template-preview"></div><span>Тёплый</span></button>
+        </div>
+        <div class="helper">Шаблон меняет цветовую подачу и композицию. Все надписи можно редактировать.</div>
+      </div>
+    </aside>
+
+    <section class="panel canvas-panel">
+      <div class="panel-head"><h2>02 / Предпросмотр</h2><span class="step">ЖИВОЙ РЕДАКТОР</span></div>
+      <div class="canvas-toolbar">
+        <div class="toolbar-group">
+          <select id="aspectRatio" class="input" style="width:auto;min-height:36px;padding:7px 9px;font-size:12px" aria-label="Формат карточки">
+            <option value="3:4">Вертикальная 3:4</option><option value="4:5">Портрет 4:5</option><option value="1:1">Квадрат 1:1</option><option value="2:3">Постер 2:3</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <button class="btn small" id="fitBtn" title="Обновить предпросмотр">↻ Обновить</button>
+          <button class="btn small" id="resetBtn" title="Сбросить оформление">Сбросить</button>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <div class="canvas-shell"><canvas id="cardCanvas" width="900" height="1200" aria-label="Предпросмотр карточки товара"></canvas></div>
+      </div>
+      <div class="canvas-note"><span>Экспорт: PNG высокого разрешения</span><span class="status" id="canvasStatus">● Макет готов</span></div>
+    </section>
+
+    <aside class="right-stack">
+      <section class="panel">
+        <div class="panel-head"><h2>03 / Внешний вид</h2><span class="step">ДИЗАЙН</span></div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Акцентный цвет</label>
+            <div class="color-row" id="colorSwatches">
+              <button class="swatch active" data-color="#a5f05c" style="background:#a5f05c" aria-label="Лаймовый"></button>
+              <button class="swatch" data-color="#f4a261" style="background:#f4a261" aria-label="Оранжевый"></button>
+              <button class="swatch" data-color="#7ca9ff" style="background:#7ca9ff" aria-label="Голубой"></button>
+              <button class="swatch" data-color="#e8a5d8" style="background:#e8a5d8" aria-label="Розовый"></button>
+              <button class="swatch" data-color="#e6c76a" style="background:#e6c76a" aria-label="Золотой"></button>
+              <button class="swatch" data-color="#ffffff" style="background:#fff" aria-label="Белый"></button>
+              <label class="swatch" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)" title="Свой цвет"><input type="color" id="customColor" value="#a5f05c" aria-label="Выбрать свой цвет"></label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="backgroundMode">Фон карточки</label>
+            <select id="backgroundMode" class="input"><option value="auto">Под стиль шаблона</option><option value="solid">Однотонный</option><option value="gradient">Мягкий градиент</option></select>
+          </div>
+          <div class="field">
+            <label for="productScale">Размер фото товара</label>
+            <div class="range-row"><input type="range" id="productScale" min="60" max="120" value="100"><span class="range-value" id="scaleValue">100%</span></div>
+          </div>
+          <div class="field">
+            <label for="textScale">Размер текста</label>
+            <div class="range-row"><input type="range" id="textScale" min="80" max="125" value="100"><span class="range-value" id="textScaleValue">100%</span></div>
+          </div>
+          <div class="switch-row"><span>Показывать преимущества</span><input class="switch" type="checkbox" id="showBenefits" checked></div>
+          <div class="switch-row"><span>Показывать декоративные элементы</span><input class="switch" type="checkbox" id="showDecor" checked></div>
+          <div class="switch-row"><span>Показывать нижнюю подпись</span><input class="switch" type="checkbox" id="showFooter" checked></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>04 / Экспорт и проекты</h2><span class="step">ФАЙЛЫ</span></div>
+        <div class="panel-body">
+          <div class="field"><label for="exportQuality">Размер экспортируемого изображения</label><select id="exportQuality" class="input"><option value="1">Стандарт — 900 px по ширине</option><option value="1.5" selected>Высокий — 1350 px по ширине</option><option value="2">Максимальный — 1800 px по ширине</option></select></div>
+          <div class="export-actions">
+            <button class="btn primary" id="exportBtn">↧ Скачать PNG</button>
+            <button class="btn" id="saveProjectBtn">▣ Сохранить проект</button>
+          </div>
+          <div class="helper">PNG подходит для публикации и дальнейшей обработки. Проверяйте требования конкретного маркетплейса перед загрузкой.</div>
+          <div class="divider"></div>
+          <div class="section-label"><span>Сохранённые проекты</span><button class="btn small ghost" id="clearProjectsBtn">Очистить</button></div>
+          <div id="savedProjects" class="saved-list"><div class="empty">Пока нет сохранённых проектов.</div></div>
+        </div>
+      </section>
+    </aside>
+  </section>
+  <div class="footer">CardForge · Редактор карточек · AI-обработка отправляет фото на указанный вами сервис</div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('cardCanvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const state = {
+    images: [], activeImage: 0, template: 'light', accent: '#a5f05c',
+    aspect: '3:4', scale: 100, textScale: 100, backgroundMode: 'auto',
+    showBenefits: true, showDecor: true, showFooter: true
+  };
+  let toastTimer = null;
+  let renderToken = 0;
+
+  const themes = {
+    light: {bg:'#f1f0e9',bg2:'#ffffff',ink:'#171a18',muted:'#5d635c',panel:'#e4e6dc',accentText:'#17200f',card:'#fffdf8'},
+    dark: {bg:'#11141b',bg2:'#262b35',ink:'#f6f4ee',muted:'#c2c5ce',panel:'#303642',accentText:'#11150d',card:'#1a1e27'},
+    warm: {bg:'#f3e3d2',bg2:'#fff4e8',ink:'#492f25',muted:'#8b6d5b',panel:'#e7c9ae',accentText:'#3c2419',card:'#fff3e6'}
+  };
+
+  function showToast(message) {
+    const el = $('toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+  function setStatus(message) { $('canvasStatus').textContent = '● ' + message; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function currentTheme() { return themes[state.template] || themes.light; }
+  function readText(id) { return $(id).value.trim(); }
+  function getBenefits() { return readText('benefits').split(/\n+/).map(s=>s.trim()).filter(Boolean).slice(0,4); }
+  function getDimensions() {
+    const ratios = {'3:4':[900,1200],'4:5':[900,1125],'1:1':[1000,1000],'2:3':[900,1350]};
+    return ratios[state.aspect] || ratios['3:4'];
+  }
+  function roundedRect(c,x,y,w,h,r,fill,stroke) {
+    const rr=Math.min(r,w/2,h/2); c.beginPath();c.moveTo(x+rr,y);c.arcTo(x+w,y,x+w,y+h,rr);c.arcTo(x+w,y+h,x,y+h,rr);c.arcTo(x,y+h,x,y,rr);c.arcTo(x,y,x+w,y,rr);c.closePath();
+    if(fill){c.fillStyle=fill;c.fill()} if(stroke){c.strokeStyle=stroke;c.stroke()}
+  }
+  function drawCoverImage(c,img,x,y,w,h,scale=1) {
+    const ratio=Math.min(w/img.width,h/img.height)*scale;
+    const dw=img.width*ratio,dh=img.height*ratio;
+    const dx=x+(w-dw)/2,dy=y+(h-dh)/2;
+    c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+    c.shadowColor='rgba(0,0,0,.16)';c.shadowBlur=24;c.shadowOffsetY=12;
+    c.drawImage(img,dx,dy,dw,dh);c.restore();
+  }
+  function drawContainImage(c,img,x,y,w,h,scale=1) {
+    const ratio=Math.min(w/img.width,h/img.height)*scale;
+    const dw=img.width*ratio,dh=img.height*ratio;
+    const dx=x+(w-dw)/2,dy=y+(h-dh)/2;
+    c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+    c.shadowColor='rgba(0,0,0,.20)';c.shadowBlur=18;c.shadowOffsetY=8;
+    c.drawImage(img,dx,dy,dw,dh);c.restore();
+  }
+  function wrapText(c,text,maxWidth,maxLines=3) {
+    const words=String(text||'').split(/\s+/); const lines=[];let line='';
+    for(const word of words){
+      const test=line?line+' '+word:word;
+      if(c.measureText(test).width>maxWidth&&line){lines.push(line);line=word;if(lines.length>=maxLines)break}
+      else line=test;
+    }
+    if(line&&lines.length<maxLines)lines.push(line);
+    if(lines.length===maxLines&&words.join(' ')!==lines.join(' ')){
+      let last=lines[lines.length-1];while(last.length&&c.measureText(last+'…').width>maxWidth)last=last.slice(0,-1);lines[lines.length-1]=last.trim()+'…';
+    }
+    return lines;
+  }
+  function drawWrapped(c,text,x,y,maxWidth,lineHeight,maxLines,align='left') {
+    const lines=wrapText(c,text,maxWidth,maxLines);c.textAlign=align;
+    lines.forEach((line,i)=>c.fillText(line,x,y+i*lineHeight));return lines.length;
+  }
+  function drawCard(target, multiplier=1) {
+    const [baseW,baseH]=getDimensions();
+    target.width=Math.round(baseW*multiplier);target.height=Math.round(baseH*multiplier);
+    target.setAttribute('aria-label','Предпросмотр карточки товара');
+    const c=target.getContext('2d',{alpha:false});
+    c.setTransform(multiplier,0,0,multiplier,0,0);
+    const W=baseW,H=baseH,theme=currentTheme(),accent=state.accent;
+    const bgMode=state.backgroundMode;
+    let bg=theme.bg;
+    if(bgMode==='solid') bg=state.template==='dark'?'#171a22':state.template==='warm'?'#f0d9c3':'#f6f5f0';
+    c.fillStyle=bg;c.fillRect(0,0,W,H);
+    if(bgMode==='gradient'||bgMode==='auto'){
+      const g=c.createLinearGradient(0,0,W,H);
+      if(state.template==='dark'){g.addColorStop(0,'#303644');g.addColorStop(1,'#11141b')}
+      else if(state.template==='warm'){g.addColorStop(0,'#f8e8d8');g.addColorStop(1,'#e7c7a9')}
+      else {g.addColorStop(0,'#faf9f4');g.addColorStop(1,'#e8eae1')}
+      c.fillStyle=g;c.fillRect(0,0,W,H);
+    }
+    if(state.showDecor){
+      c.save();c.globalAlpha=state.template==='dark'?.24:.35;
+      c.fillStyle=accent;c.beginPath();c.arc(W-80,105,145,0,Math.PI*2);c.fill();
+      c.globalAlpha=.13;c.beginPath();c.arc(40,H-120,125,0,Math.PI*2);c.fill();c.restore();
+      c.fillStyle=accent;c.fillRect(54,54,56,7);
+    }
+    const margin=64, scale=state.textScale/100;
+    const ink=theme.ink, muted=theme.muted;
+    let y=104;
+    if(state.template==='dark') y=120;
+    c.fillStyle=muted;c.font=`800 ${Math.round(18*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;
+    c.textAlign='left';
+    const cat=readText('category').toUpperCase();
+    c.fillText(cat.slice(0,32),margin,y);
+    y+=61;
+    c.fillStyle=ink;c.font=`900 ${Math.round(54*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;
+    const title=readText('productName')||'Название товара';
+    const titleLines=drawWrapped(c,title,margin,y,W-margin*2,Math.round(61*scale),3);
+    y+=titleLines*Math.round(61*scale)+12;
+    c.fillStyle=muted;c.font=`500 ${Math.round(25*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;
+    const subtitle=readText('subtitle');
+    if(subtitle){const n=drawWrapped(c,subtitle,margin,y,W-margin*2,Math.round(33*scale),2);y+=n*Math.round(33*scale)+17;}
+    if(readText('badgeText')){
+      c.font=`900 ${Math.round(17*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;
+      const badge=readText('badgeText').toUpperCase().slice(0,30);
+      const bw=Math.min(W-margin*2,c.measureText(badge).width+38),bh=42;
+      roundedRect(c,margin,y,bw,bh,13,accent);
+      c.fillStyle=theme.accentText;c.textAlign='center';c.fillText(badge,margin+bw/2,y+27);
+      y+=bh+16;
+    }
+    const footerSpace=state.showFooter?90:45;
+    const benefitSpace=state.showBenefits&&getBenefits().length?Math.min(200,getBenefits().length*48+28):0;
+    const photoTop=Math.max(y+5,Math.round(H*.34));
+    const photoBottom=H-footerSpace-benefitSpace-25;
+    const photoH=Math.max(140,photoBottom-photoTop);
+    const photoX=margin+8,photoW=W-margin*2-16;
+    if(state.images.length){
+      const image=state.images[Math.min(state.activeImage,state.images.length-1)].image;
+      c.save();
+      if(state.template==='dark') roundedRect(c,photoX,photoTop,photoW,photoH,28,'#242936');
+      else if(state.template==='warm') roundedRect(c,photoX,photoTop,photoW,photoH,28,'#f7e6d6');
+      else roundedRect(c,photoX,photoTop,photoW,photoH,28,'#fffdf8');
+      c.restore();
+      if(state.images[Math.min(state.activeImage,state.images.length-1)].sceneImage){
+        const entry=state.images[Math.min(state.activeImage,state.images.length-1)];
+        const fx=photoX+18,fy=photoTop+15,fw=photoW-36,fh=photoH-30;
+        drawCoverImage(c,entry.sceneImage,fx,fy,fw,fh,1);
+        drawContainImage(c,image,fx,fy,fw,fh,state.scale/100);
+      }else{
+        drawCoverImage(c,image,photoX+18,photoTop+15,photoW-36,photoH-30,state.scale/100);
+      }
+    } else {
+      roundedRect(c,photoX,photoTop,photoW,photoH,28,theme.panel);
+      c.save();c.strokeStyle=muted;c.globalAlpha=.6;c.setLineDash([9,9]);c.lineWidth=2;
+      c.strokeRect(photoX+25,photoTop+25,photoW-50,photoH-50);c.restore();
+      c.fillStyle=ink;c.textAlign='center';c.font='800 28px -apple-system,BlinkMacSystemFont,Arial,sans-serif';
+      c.fillText('ВАШ ТОВАР',W/2,photoTop+photoH/2-8);
+      c.fillStyle=muted;c.font='500 18px -apple-system,BlinkMacSystemFont,Arial,sans-serif';
+      c.fillText('Загрузите фотографию слева',W/2,photoTop+photoH/2+25);
+    }
+    let bottomY=photoTop+photoH+26;
+    if(state.showBenefits&&getBenefits().length){
+      const benefits=getBenefits(),gap=12,bh=42;
+      const cols=benefits.length===1?1:2;
+      const cellW=(W-margin*2-(cols-1)*gap)/cols;
+      c.font=`750 ${Math.round(17*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;
+      benefits.forEach((benefit,i)=>{
+        const col=i%cols,row=Math.floor(i/cols),bx=margin+col*(cellW+gap),by=bottomY+row*(bh+9);
+        roundedRect(c,bx,by,cellW,bh,12,state.template==='dark'?'#2d3340':theme.card);
+        c.fillStyle=accent;c.beginPath();c.arc(bx+19,by+bh/2,5,0,Math.PI*2);c.fill();
+        c.fillStyle=ink;c.textAlign='left';
+        let t=benefit;while(t.length>27&&c.measureText(t+'…').width>cellW-48)t=t.slice(0,-1);if(t!==benefit)t+='…';
+        c.fillText(t,bx+32,by+26);
+      });
+      bottomY+=Math.ceil(benefits.length/cols)*(bh+9);
+    }
+    if(state.showFooter&&readText('footerText')){
+      const fy=H-55;
+      c.fillStyle=ink;c.font=`800 ${Math.round(17*scale)}px -apple-system,BlinkMacSystemFont,Arial,sans-serif`;c.textAlign='left';
+      c.fillText(readText('footerText').slice(0,45),margin,fy);
+      c.fillStyle=accent;c.fillRect(W-margin-48,fy-12,48,5);
+    }
+    if(state.template==='dark'){
+      c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=2;c.strokeRect(1,1,W-2,H-2);
+    }
+  }
+  function render() {
+    const token=++renderToken;
+    requestAnimationFrame(()=>{if(token!==renderToken)return;drawCard(canvas,1);setStatus('Макет обновлён');});
+  }
+  function updateRatio() {
+    state.aspect=$('aspectRatio').value;
+    render();
+  }
+  function updateScaleLabels() {
+    $('scaleValue').textContent=state.scale+'%';
+    $('textScaleValue').textContent=state.textScale+'%';
+  }
+  function updateFiles() {
+    const list=$('fileList');list.innerHTML='';
+    state.images.forEach((entry,index)=>{
+      const wrap=document.createElement('div');wrap.className='file-thumb';wrap.title=entry.name;
+      const img=document.createElement('img');img.src=entry.url;img.alt=entry.name;
+      img.style.outline=index===state.activeImage?'2px solid #a5f05c':'none';
+      img.style.outlineOffset='-2px';img.style.cursor='pointer';
+      img.addEventListener('click',()=>{state.activeImage=index;updateFiles();render()});
+      const remove=document.createElement('button');remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','Удалить '+entry.name);
+      remove.addEventListener('click',(ev)=>{ev.stopPropagation();if(entry.url&&entry.url.startsWith('blob:'))URL.revokeObjectURL(entry.url);state.images.splice(index,1);if(state.activeImage>=state.images.length)state.activeImage=Math.max(0,state.images.length-1);updateFiles();render()});
+      wrap.append(img,remove);list.appendChild(wrap);
+    });
+  }
+  function loadFiles(files) {
+    const valid=Array.from(files||[]).filter(f=>f.type.startsWith('image/'));
+    if(!valid.length){showToast('Выберите изображение в формате JPG, PNG или WebP.');return;}
+    const allowed=valid.slice(0,8-state.images.length);
+    if(!allowed.length){showToast('Можно загрузить до 8 фотографий.');return;}
+    let pending=allowed.length;
+    allowed.forEach(file=>{
+      const url=URL.createObjectURL(file),img=new Image();
+      img.onload=()=>{state.images.push({name:file.name,url,image:img,sceneImage:null,aiOriginal:null});pending--;if(pending===0){state.activeImage=state.images.length-allowed.length;updateFiles();render();showToast('Фотография добавлена в проект.');}};
+      img.onerror=()=>{URL.revokeObjectURL(url);pending--;if(pending===0){updateFiles();render();showToast('Не удалось прочитать одно из изображений.');}};
+      img.src=url;
+    });
+    $('imageInput').value='';
+  }
+  function collectProject() {
+    return {
+      version:1, name:readText('productName')||'Без названия',
+      productName:$('productName').value,subtitle:$('subtitle').value,benefits:$('benefits').value,
+      badgeText:$('badgeText').value,footerText:$('footerText').value,category:$('category').value,
+      template:state.template,accent:state.accent,aspect:state.aspect,scale:state.scale,textScale:state.textScale,
+      backgroundMode:state.backgroundMode,showBenefits:state.showBenefits,showDecor:state.showDecor,showFooter:state.showFooter,
+      images:state.images.map(i=>({name:i.name,data:i.url,hasScene:!!i.sceneImage})),updatedAt:new Date().toISOString()
+    };
+  }
+  function imageToDataURL(img, type='image/png', quality) {
+    const c=document.createElement('canvas');c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return c.toDataURL(type,quality);
+  }
+  function safeProjectForStorage() {
+    return new Promise(resolve=>{
+      const project=collectProject();
+      const images=state.images.slice();
+      if(!images.length){project.images=[];resolve(project);return;}
+      project.images=images.map(entry=>{
+        const max=640,ratio=Math.min(1,max/Math.max(entry.image.width,entry.image.height));
+        const thumb=document.createElement('canvas');
+        thumb.width=Math.max(1,Math.round(entry.image.width*ratio));thumb.height=Math.max(1,Math.round(entry.image.height*ratio));
+        thumb.getContext('2d').drawImage(entry.image,0,0,thumb.width,thumb.height);
+        let data='';try{data=thumb.toDataURL('image/png')}catch(e){}
+        let sceneData='';
+        if(entry.sceneImage){
+          const bg=document.createElement('canvas');const br=Math.min(1,max/Math.max(entry.sceneImage.width,entry.sceneImage.height));
+          bg.width=Math.max(1,Math.round(entry.sceneImage.width*br));bg.height=Math.max(1,Math.round(entry.sceneImage.height*br));
+          bg.getContext('2d').drawImage(entry.sceneImage,0,0,bg.width,bg.height);
+          try{sceneData=bg.toDataURL('image/jpeg',.78)}catch(e){}
+        }
+        return {name:entry.name,data,sceneData,hasScene:!!sceneData};
+      });
+      resolve(project);
+    });
+  }
+  async function saveProject() {
+    try{
+      const project=await safeProjectForStorage();
+      let projects=JSON.parse(localStorage.getItem('cardforge_projects')||'[]');
+      project.id=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+      projects.unshift(project);projects=projects.slice(0,12);
+      localStorage.setItem('cardforge_projects',JSON.stringify(projects));
+      renderSavedProjects();showToast('Проект сохранён на этом устройстве.');
+    }catch(err){showToast('Не удалось сохранить проект: память браузера может быть заполнена.');}
+  }
+  function renderSavedProjects() {
+    const root=$('savedProjects');root.innerHTML='';
+    let projects=[];
+    try{projects=JSON.parse(localStorage.getItem('cardforge_projects')||'[]')}catch(e){}
+    if(!projects.length){root.innerHTML='<div class="empty">Пока нет сохранённых проектов.</div>';return;}
+    projects.forEach(p=>{
+      const row=document.createElement('div');row.className='saved-item';
+      const img=document.createElement('img');img.className='saved-preview';img.alt='Превью проекта';
+      if(p.images&&p.images[0]&&p.images[0].data)img.src=p.images[0].data;
+      const info=document.createElement('div');info.className='saved-info';
+      const title=document.createElement('strong');title.textContent=p.productName||p.name||'Без названия';
+      const date=document.createElement('small');date.textContent=p.updatedAt?new Date(p.updatedAt).toLocaleDateString('ru-RU'):'Сохранённый проект';
+      info.append(title,date);
+      const open=document.createElement('button');open.className='btn';open.textContent='Открыть';open.addEventListener('click',()=>restoreProject(p.id));
+      const del=document.createElement('button');del.className='btn danger';del.textContent='×';del.title='Удалить проект';del.addEventListener('click',()=>deleteProject(p.id));
+      row.append(img,info,open,del);root.appendChild(row);
+    });
+  }
+  function restoreProject(id) {
+    let projects=[];try{projects=JSON.parse(localStorage.getItem('cardforge_projects')||'[]')}catch(e){}
+    const p=projects.find(x=>x.id===id);if(!p)return;
+    ['productName','subtitle','benefits','badgeText','footerText','category'].forEach(k=>{if(p[k]!==undefined)$(k).value=p[k]});
+    state.template=p.template||'light';state.accent=p.accent||'#a5f05c';state.aspect=p.aspect||'3:4';
+    state.scale=p.scale||100;state.textScale=p.textScale||100;state.backgroundMode=p.backgroundMode||'auto';
+    state.showBenefits=p.showBenefits!==false;state.showDecor=p.showDecor!==false;state.showFooter=p.showFooter!==false;
+    $('aspectRatio').value=state.aspect;$('productScale').value=state.scale;$('textScale').value=state.textScale;
+    $('backgroundMode').value=state.backgroundMode;$('showBenefits').checked=state.showBenefits;$('showDecor').checked=state.showDecor;$('showFooter').checked=state.showFooter;
+    document.querySelectorAll('.template').forEach(b=>b.classList.toggle('active',b.dataset.template===state.template));
+    document.querySelectorAll('.swatch').forEach(b=>b.classList.toggle('active',b.dataset.color===state.accent));
+    $('customColor').value=state.accent;updateScaleLabels();
+    state.images.forEach(i=>{if(i.url&&i.url.startsWith('blob:'))URL.revokeObjectURL(i.url)});
+    state.images=[];state.activeImage=0;
+    const imgItems=p.images||[];let remaining=imgItems.length;
+    if(!remaining){updateFiles();render();showToast('Проект открыт.');return;}
+    imgItems.forEach(item=>{
+      const img=new Image();
+      img.onload=()=>{
+        const entry={name:item.name||'Фото товара',url:item.data,image:img,sceneImage:null};
+        if(item.sceneData){
+          const bg=new Image();
+          bg.onload=()=>{entry.sceneImage=bg;state.images.push(entry);finishOne();};
+          bg.onerror=()=>{state.images.push(entry);finishOne();};
+          bg.src=item.sceneData;
+        }else{state.images.push(entry);finishOne();}
+        function finishOne(){remaining--;if(!remaining){updateFiles();render();showToast('Проект открыт.');}}
+      };
+      img.onerror=()=>{remaining--;if(!remaining){updateFiles();render();showToast('Проект открыт, но часть фото не загрузилась.');}};
+      img.src=item.data;
+    });
+  }
+  function deleteProject(id) {
+    let projects=[];try{projects=JSON.parse(localStorage.getItem('cardforge_projects')||'[]')}catch(e){}
+    localStorage.setItem('cardforge_projects',JSON.stringify(projects.filter(p=>p.id!==id)));
+    renderSavedProjects();showToast('Проект удалён.');
+  }
+  const AI_PRESETS = {
+    studio: 'Фотореалистичный фон профессиональной предметной фотостудии, мягкий рассеянный свет, чистая нейтральная поверхность, спокойные светлые тона, свободное пространство по центру, без текста, без логотипов, без дополнительных товаров.',
+    interior: 'Фотореалистичный современный домашний интерьер, естественный дневной свет, сдержанный минимализм, подходящая поверхность для предметной съёмки, фон не отвлекает от товара, свободное пространство по центру, без текста и логотипов.',
+    premium: 'Премиальная рекламная предметная съёмка, элегантная фактурная поверхность, мягкий направленный студийный свет, изысканные нейтральные оттенки, реалистичные тени, свободное пространство по центру, без текста и логотипов.',
+    nature: 'Фотореалистичная природная сцена, мягкий естественный свет, натуральные материалы и спокойные природные оттенки, чистая композиция с открытым пространством в центре, без текста, без логотипов и без лишних предметов.'
+  };
+  let aiOriginals = new WeakMap();
+  function aiSetStatus(message, kind='') {
+    const el=$('aiStatus');el.textContent=message;el.className='ai-status'+(kind?' '+kind:'');
+  }
+  function aiBase() {
+    return $('aiBaseUrl').value.trim().replace(/\/+$/,'');
+  }
+  function updateAIPrompt() {
+    const scene=$('aiScene').value;
+    if(scene!=='custom')$('aiPrompt').value=AI_PRESETS[scene]||AI_PRESETS.studio;
+  }
+  function fileFromImage(img,name='product.png') {
+    return new Promise((resolve,reject)=>{
+      const c=document.createElement('canvas');c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;
+      const cx=c.getContext('2d');cx.clearRect(0,0,c.width,c.height);cx.drawImage(img,0,0);
+      c.toBlob(blob=>blob?resolve(new File([blob],name,{type:'image/png'})):reject(new Error('Не удалось подготовить изображение.')),'image/png');
+    });
+  }
+  async function parseImageResponse(response) {
+    if(!response.ok){
+      let detail='';try{detail=(await response.text()).slice(0,500)}catch(e){}
+      throw new Error('Сервис ответил HTTP '+response.status+(detail?': '+detail:''));
+    }
+    const type=(response.headers.get('content-type')||'').toLowerCase();
+    if(type.includes('image/'))return await createImageBitmap(await response.blob());
+    const data=await response.json();
+    const raw=data.imageBase64||data.image_base64||data.image||data.dataUrl||data.data_url;
+    if(typeof raw==='string'){
+      const src=raw.startsWith('data:')?raw:'data:image/png;base64,'+raw;
+      return await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('API вернул некорректное изображение.'));im.src=src;});
+    }
+    if(typeof data.imageUrl==='string'||typeof data.image_url==='string'){
+      const url=data.imageUrl||data.image_url;
+      const r=await fetch(url);if(!r.ok)throw new Error('Не удалось загрузить изображение, возвращённое API.');
+      return await createImageBitmap(await r.blob());
+    }
+    throw new Error('Неизвестный ответ API. Ожидался PNG/JPEG или JSON с imageBase64.');
+  }
+  async function aiFetch(path, options) {
+    const base=aiBase();
+    if(!base)throw new Error('Сначала укажите адрес вашего AI API.');
+    let url;
+    try{url=new URL(base+path)}catch(e){throw new Error('Проверьте адрес API.');}
+    if(location.protocol==='https:'&&url.protocol!=='https:')throw new Error('На HTTPS-странице сервис тоже должен работать по HTTPS.');
+    const headers=new Headers(options.headers||{});
+    const token=$('aiToken').value.trim();
+    if(token)headers.set('Authorization','Bearer '+token);
+    const response=await fetch(url.toString(),{...options,headers});
+    return response;
+  }
+  async function replaceBackgroundWithAI() {
+    if(!state.images.length){showToast('Сначала загрузите фотографию товара.');return;}
+    const entry=state.images[Math.min(state.activeImage,state.images.length-1)];
+    const prompt=$('aiPrompt').value.trim();
+    if(!prompt){aiSetStatus('Добавьте описание фона перед запуском.','error');return;}
+    if(!aiBase()){aiSetStatus('Не настроен API: укажите адрес совместимого backend-сервиса.','error');return;}
+    const btn=$('aiReplaceBtn');btn.disabled=true;btn.textContent='Обработка…';
+    try{
+      aiSetStatus('Шаг 1 из 2: отправляем фото на реальное AI-удаление фона…');
+      const source=await fileFromImage(entry.image,entry.name||'product.png');
+      const form=new FormData();form.append('image',source,source.name);
+      const removeResponse=await aiFetch('/remove-background',{method:'POST',body:form});
+      const cutout=await parseImageResponse(removeResponse);
+      aiSetStatus('Шаг 2 из 2: запрашиваем генерацию нового фона…');
+      const w=1024,h=1024;
+      const generateResponse=await aiFetch('/generate-background',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          scene:$('aiScene').value,
+          prompt,
+          width:w,
+          height:h,
+          productName:readText('productName'),
+          instructions:'Generate background only, no product, no text, no logos. Keep the center clear so a separate transparent product cutout can be composited on top.'
+        })
+      });
+      const sceneImage=await parseImageResponse(generateResponse);
+      // Keep the original for the explicit restore button, and only commit after both API calls succeed.
+      if(!entry.aiOriginal)entry.aiOriginal={image:entry.image,url:entry.url,sceneImage:entry.sceneImage};
+      entry.image=cutout;entry.sceneImage=sceneImage;entry.aiProcessed=true;
+      entry.url=imageToDataURL(cutout,'image/png');
+      updateFiles();render();
+      aiSetStatus('Готово: фон удалён сервисом, новый фон сгенерирован сервисом.','success');
+      showToast('AI-фон создан и применён.');
+    }catch(err){
+      console.error(err);
+      const msg=err&&err.message?err.message:String(err);
+      aiSetStatus('Не удалось обработать фото: '+msg+' Проверьте адрес API, CORS, авторизацию и контракт ответов.','error');
+      showToast('AI-обработка не завершена.');
+    }finally{btn.disabled=false;btn.textContent='✦ Удалить старый фон и создать новый';}
+  }
+  function restoreOriginalImage() {
+    if(!state.images.length){showToast('Нет загруженного фото.');return;}
+    const entry=state.images[Math.min(state.activeImage,state.images.length-1)];
+    if(!entry.aiOriginal){aiSetStatus('Для этого фото ещё не сохранён исходный вариант.');return;}
+    entry.image=entry.aiOriginal.image;entry.url=entry.aiOriginal.url;entry.sceneImage=entry.aiOriginal.sceneImage||null;
+    entry.aiOriginal=null;entry.aiProcessed=false;updateFiles();render();
+    aiSetStatus('Исходное фото восстановлено.','success');showToast('Исходное фото восстановлено.');
+  }
+  function exportPNG() {
+    try{
+      const multiplier=parseFloat($('exportQuality').value)||1;
+      const output=document.createElement('canvas');drawCard(output,multiplier);
+      const filename=(readText('productName')||'cardforge-card').toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,55)||'cardforge-card';
+      output.toBlob(blob=>{
+        if(!blob){showToast('Не удалось подготовить PNG. Попробуйте ещё раз.');return;}
+        const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+'.png';document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),1500);showToast('PNG готов к сохранению.');
+      },'image/png');
+    }catch(e){showToast('Ошибка экспорта. Попробуйте уменьшить размер изображения.');}
+  }
+  function newProject() {
+    if(!confirm('Создать новый проект? Несохранённые изменения будут потеряны.'))return;
+    ['productName','subtitle','benefits','badgeText','footerText'].forEach((id,i)=>$(id).value=['','', '', '', ''][i]);
+    $('category').selectedIndex=0;
+    state.images.forEach(i=>{if(i.url&&i.url.startsWith('blob:'))URL.revokeObjectURL(i.url)});state.images=[];state.activeImage=0;
+    state.template='light';state.accent='#a5f05c';state.aspect='3:4';state.scale=100;state.textScale=100;state.backgroundMode='auto';
+    state.showBenefits=true;state.showDecor=true;state.showFooter=true;
+    $('aspectRatio').value=state.aspect;$('productScale').value=100;$('textScale').value=100;$('backgroundMode').value='auto';
+    $('showBenefits').checked=true;$('showDecor').checked=true;$('showFooter').checked=true;
+    document.querySelectorAll('.template').forEach(b=>b.classList.toggle('active',b.dataset.template==='light'));
+    document.querySelectorAll('.swatch').forEach(b=>b.classList.toggle('active',b.dataset.color==='#a5f05c'));
+    $('customColor').value='#a5f05c';updateFiles();updateScaleLabels();render();showToast('Создан новый проект.');
+  }
+  function resetDesign() {
+    state.template='light';state.accent='#a5f05c';state.scale=100;state.textScale=100;state.backgroundMode='auto';
+    $('productScale').value=100;$('textScale').value=100;$('backgroundMode').value='auto';updateScaleLabels();
+    document.querySelectorAll('.template').forEach(b=>b.classList.toggle('active',b.dataset.template==='light'));
+    document.querySelectorAll('.swatch').forEach(b=>b.classList.toggle('active',b.dataset.color==='#a5f05c'));
+    $('customColor').value='#a5f05c';render();showToast('Оформление сброшено.');
+  }
+
+  $('aiScene').addEventListener('change',updateAIPrompt);
+  $('aiReplaceBtn').addEventListener('click',replaceBackgroundWithAI);
+  $('aiRestoreBtn').addEventListener('click',restoreOriginalImage);
+  updateAIPrompt();
+  $('imageInput').addEventListener('change',e=>loadFiles(e.target.files));
+  const drop=$('uploadDrop');
+  ['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('dragover')}));
+  ['dragleave','drop'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.remove('dragover')}));
+  drop.addEventListener('drop',e=>loadFiles(e.dataTransfer.files));
+  ['productName','subtitle','benefits','badgeText','footerText','category'].forEach(id=>$(id).addEventListener('input',render));
+  $('aspectRatio').addEventListener('change',updateRatio);
+  $('productScale').addEventListener('input',e=>{state.scale=+e.target.value;updateScaleLabels();render()});
+  $('textScale').addEventListener('input',e=>{state.textScale=+e.target.value;updateScaleLabels();render()});
+  $('backgroundMode').addEventListener('change',e=>{state.backgroundMode=e.target.value;render()});
+  $('showBenefits').addEventListener('change',e=>{state.showBenefits=e.target.checked;render()});
+  $('showDecor').addEventListener('change',e=>{state.showDecor=e.target.checked;render()});
+  $('showFooter').addEventListener('change',e=>{state.showFooter=e.target.checked;render()});
+  document.querySelectorAll('.template').forEach(btn=>btn.addEventListener('click',()=>{
+    state.template=btn.dataset.template;document.querySelectorAll('.template').forEach(b=>b.classList.toggle('active',b===btn));render();
+  }));
+  document.querySelectorAll('.swatch[data-color]').forEach(btn=>btn.addEventListener('click',()=>{
+    state.accent=btn.dataset.color;document.querySelectorAll('.swatch').forEach(b=>b.classList.toggle('active',b===btn));$('customColor').value=state.accent;render();
+  }));
+  $('customColor').addEventListener('input',e=>{state.accent=e.target.value;document.querySelectorAll('.swatch[data-color]').forEach(b=>b.classList.toggle('active',b.dataset.color===state.accent));render()});
+  $('exportBtn').addEventListener('click',exportPNG);$('quickExportBtn').addEventListener('click',exportPNG);
+  $('saveProjectBtn').addEventListener('click',saveProject);$('newProjectBtn').addEventListener('click',newProject);
+  $('fitBtn').addEventListener('click',()=>{render();showToast('Предпросмотр обновлён.')});
+  $('resetBtn').addEventListener('click',resetDesign);
+  $('clearProjectsBtn').addEventListener('click',()=>{
+    if(confirm('Удалить все сохранённые проекты из этого браузера?')){localStorage.removeItem('cardforge_projects');renderSavedProjects();showToast('Сохранённые проекты очищены.');}
+  });
+  window.addEventListener('beforeunload',()=>state.images.forEach(i=>{if(i.url.startsWith('blob:'))URL.revokeObjectURL(i.url)}));
+  updateScaleLabels();renderSavedProjects();render();
+})();
+</script>
+</body>
+</html>
